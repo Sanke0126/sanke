@@ -1,71 +1,18 @@
 <?php
 
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Job;
 
-Route::get('/', function () {
-    return view('home');
-});
+Route::resource('jobs', JobController::class);
+Route::view('/', 'home');
+Route::view('/contact', 'contact');
 
-Route::get('/jobs', function () {
-    $jobs = Job::with('employer')->latest()->cursorPaginate(3);
-    return view('jobs.index', [
-        'jobs' => $jobs
-    ]);
-});
+//Auth
+Route::get('/register', [RegisterController::class, 'create']);
+Route::post('/register', [RegisterController::class, 'store']);
 
-//Create
-Route::get('/jobs/create', function () {
-    return view('jobs.create');
-});
-
-//Show
-Route::get('/jobs/{id}', function ($id) {
-    $job = Job::find($id);
-    return view('jobs.show', ['job' => $job]);
-});
-
-//Store
-Route::post('/jobs', function () {
-    request()->validate([
-        'title' => ['required', 'min:3'],
-        'salary' => ['required'],
-    ]);
-    Job::create([
-        'title' => request('title'),
-        'salary' => request('salary'),
-        'employer_id' => 1
-    ]);
-    return redirect('/jobs');
-});
-
-//Edit
-Route::get('/jobs/{id}/edit', function ($id) {
-    $job = Job::find($id);
-    return view('jobs.edit', ['job' => $job]);
-});
-
-//Update
-Route::patch('/jobs/{id}', function ($id) {
-    request()->validate([
-        'title' => ['required', 'min:3'],
-        'salary' => ['required'],
-    ]);
-    $job = Job::find($id);
-    $job->update([
-        'title' => request('title'),
-        'salary' => request('salary'),
-    ]);
-    return redirect('/jobs/' . $job->id);
-});
-
-// //Delete
-Route::delete('/jobs/{id}', function ($id) {
-    Job::find($id)->delete();
-    return redirect('/jobs');
-});
-
-
-Route::get('/contact', function () {
-    return view('contact');
-});
+Route::get('/login', [LoginController::class, 'create']);
+Route::post('/login', [LoginController::class, 'store']);
+Route::post('/logout', [LoginController::class, 'destroy']);
