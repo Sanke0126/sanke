@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Job;
 
 class JobController extends Controller
 {
     public function index()
     {
-        $jobs = Job::with('employer')->latest()->cursorPaginate(3);
+        $jobs = Job::with('employer')->latest()->paginate(5);
         return view('jobs.index', [
             'jobs' => $jobs
         ]);
@@ -51,7 +50,7 @@ class JobController extends Controller
         ]);
         return redirect('/jobs/' . $job->id);
     }
-    public function delete(Job $job)
+    public function destroy(Job $job)
     {
         $job->delete();
         return redirect('/jobs');
